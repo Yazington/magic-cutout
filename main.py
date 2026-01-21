@@ -34,7 +34,7 @@ signature = hmac.new(
     signing_secret.encode("utf-8"), body.encode("utf-8"), hashlib.sha256
 ).hexdigest()
 
-requests.post(
+response = requests.post(
     url,
     data=body,
     headers={
@@ -43,3 +43,6 @@ requests.post(
         "X-Signature-256": f"sha256={signature}",
     },
 )
+
+print(f"Status Code: {response.status_code}")
+print(f"Response: {response.text}")
