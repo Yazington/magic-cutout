@@ -1,0 +1,23 @@
+name: Submit to B12
+
+on:
+  workflow_dispatch:  # Allow manual trigger from Actions tab
+
+jobs:
+  submit:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+      
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+      
+      - name: Submit to B12
+        run: python main.py
