@@ -1,14 +1,22 @@
+#!/usr/bin/env python3
+import sys
+import os
+
+# Ensure output is unbuffered
+sys.stdout = open(sys.stdout.fileno(), mode='w', buffering=1)
+sys.stderr = open(sys.stderr.fileno(), mode='w', buffering=1)
+
+print("===== B12 Submission Starting =====", flush=True)
+
 import requests
 import hmac
 import hashlib
-import os
-import sys
 from pyrfc3339 import generate
 from datetime import datetime, timezone
 
 from body import ApplicationSubmission
 
-print("Starting B12 submission...", file=sys.stdout, flush=True)
+print("✓ All imports successful", flush=True)
 
 url = "https://b12.io/apply/submission"
 
@@ -19,7 +27,7 @@ github_run_id = os.getenv("GITHUB_RUN_ID", "local-run")
 
 action_run_link = f"{github_server_url}/{github_repository}/actions/runs/{github_run_id}"
 
-print(f"Action Run Link: {action_run_link}", file=sys.stdout, flush=True)
+print(f"✓ Action Run Link: {action_run_link}", flush=True)
 
 submission = ApplicationSubmission(
     timestamp=generate(datetime.now(timezone.utc)),
@@ -30,9 +38,11 @@ submission = ApplicationSubmission(
     action_run_link=action_run_link,
 )
 
+print("✓ Submission object created", flush=True)
+
 body = submission.to_json()
 
-print(f"Request Body: {body}", file=sys.stdout, flush=True)
+print(f"✓ Request Body: {body}", flush=True)
 
 signing_secret = (
     "hello-there-from-b12"  # normally, comes from env var or secret manager
@@ -41,7 +51,8 @@ signature = hmac.new(
     signing_secret.encode("utf-8"), body.encode("utf-8"), hashlib.sha256
 ).hexdigest()
 
-print(f"Signature: {signature}", file=sys.stdout, flush=True)
+print(f"✓ Signature: {signature}", flush=True)
+print("→ Making POST request to B12...", flush=True)
 
 try:
     response = requests.post(
@@ -54,8 +65,11 @@ try:
         },
     )
 
-    print(f"Status Code: {response.status_code}", file=sys.stdout, flush=True)
-    print(f"Response: {response.text}", file=sys.stdout, flush=True)
+    print(f"✓ Status Code: {response.status_code}", flush=True)
+    print(f"✓ Response: {response.text}", flush=True)
+    print("===== B12 Submission Complete =====", flush=True)
 except Exception as e:
-    print(f"Error: {str(e)}", file=sys.stderr, flush=True)
+    print(f"✗ Error: {str(e)}", flush=True)
+    import traceback
+    traceback.print_exc()
     sys.exit(1)
